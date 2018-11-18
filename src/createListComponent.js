@@ -149,6 +149,79 @@ export default function createListComponent({
       scrollUpdateWasRequested: false,
     };
 
+    _getScrollLength(elem: HTMLDivElement) {
+      const {
+        scrollHeight,
+        scrollWidth,
+        clientHeight,
+        clientWidth,
+        scrollTop,
+        scrollLeft,
+      } = elem;
+      return {
+        scrollHeight,
+        scrollWidth,
+        clientHeight,
+        clientWidth,
+        scrollTop,
+        scrollLeft,
+        scrollBottom: scrollHeight - clientHeight - scrollTop,
+        scrollRight: scrollWidth - clientWidth - scrollLeft,
+      };
+    }
+
+    _setScrollLeft(elem: HTMLDivElement, scrollLeft: number) {
+      const { scrollWidth, clientWidth } = elem;
+      elem.scrollLeft = Math.min(
+        scrollWidth - clientWidth,
+        Math.max(0, scrollLeft)
+      );
+    }
+
+    _setScrollRight(elem: HTMLDivElement, scrollRight: number) {
+      const { scrollWidth, clientWidth } = elem;
+      this._setScrollLeft(
+        elem,
+        scrollWidth - clientWidth - Math.max(0, scrollRight)
+      );
+    }
+
+    _setScrollTop(elem: HTMLDivElement, scrollTop: number) {
+      const { scrollHeight, clientHeight } = elem;
+      elem.scrollTop = Math.min(
+        scrollHeight - clientHeight,
+        Math.max(0, scrollTop)
+      );
+    }
+
+    _setScrollBottom(elem: HTMLDivElement, scrollBottom: number) {
+      const { scrollHeight, clientHeight } = elem;
+      this._setScrollTop(
+        elem,
+        scrollHeight - clientHeight - Math.max(0, scrollBottom)
+      );
+    }
+
+    _maybeSetScrollOffset(scrollOffset: number) {
+      if (this._outerRef !== null) {
+        const elem = ((this._outerRef: any): HTMLDivElement);
+        const { direction, reversed } = this.props;
+        if (direction === 'horizontal') {
+          if (reversed) {
+            this._setScrollRight(elem, scrollOffset);
+          } else {
+            this._setScrollLeft(elem, scrollOffset);
+          }
+        } else {
+          if (reversed) {
+            this._setScrollBottom(elem, scrollOffset);
+          } else {
+            this._setScrollTop(elem, scrollOffset);
+          }
+        }
+      }
+    }
+
     // Always use explicit constructor for React components.
     // It produces less code after transpilation. (#26)
     // eslint-disable-next-line no-useless-constructor
@@ -191,32 +264,29 @@ export default function createListComponent({
     }
 
     componentDidMount() {
-      const { initialScrollOffset, direction } = this.props;
+      const { initialScrollOffset } = this.props;
 
-      if (typeof initialScrollOffset === 'number' && this._outerRef !== null) {
-        if (direction === 'horizontal') {
-          ((this
-            ._outerRef: any): HTMLDivElement).scrollLeft = initialScrollOffset;
-        } else {
-          ((this
-            ._outerRef: any): HTMLDivElement).scrollTop = initialScrollOffset;
-        }
+      if (typeof initialScrollOffset === 'number') {
+        this._maybeSetScrollOffset(initialScrollOffset);
       }
 
       this._callPropsCallbacks();
     }
 
     componentDidUpdate() {
-      const { direction } = this.props;
       const { scrollOffset, scrollUpdateWasRequested } = this.state;
 
-      if (scrollUpdateWasRequested && this._outerRef !== null) {
+      /*if (scrollUpdateWasRequested && this._outerRef !== null) {
         if (direction === 'horizontal') {
           ((this._outerRef: any): HTMLDivElement).scrollLeft = scrollOffset;
         } else {
           ((this._outerRef: any): HTMLDivElement).scrollTop = scrollOffset;
         }
-      }
+      }*/
+
+      // if (scrollUpdateWasRequested) {
+      this._maybeSetScrollOffset(scrollOffset);
+      // }
 
       this._callPropsCallbacks();
     }
@@ -288,11 +358,6 @@ export default function createListComponent({
             overflow: 'auto',
             WebkitOverflowScrolling: 'touch',
             willChange: 'transform',
-            transform: reversed
-              ? direction === 'horizontal'
-                ? REVERSE_HORIZONTAL_MATRIX
-                : REVERSE_VERTICAL_MATRIX
-              : '',
             ...style,
           },
         },
@@ -303,6 +368,11 @@ export default function createListComponent({
             height: direction === 'horizontal' ? '100%' : estimatedTotalSize,
             pointerEvents: isScrolling ? 'none' : '',
             width: direction === 'horizontal' ? estimatedTotalSize : '100%',
+            transform: reversed
+              ? direction === 'horizontal'
+                ? REVERSE_HORIZONTAL_MATRIX
+                : REVERSE_VERTICAL_MATRIX
+              : '',
           },
         })
       );
@@ -467,51 +537,46 @@ export default function createListComponent({
     }
 
     _onScrollHorizontal = (event: ScrollEvent): void => {
-      let { scrollLeft } = event.currentTarget;
+      const target = event.currentTarget;
+      const { scrollLeft, scrollRight } = this._getScrollLength(target);
       const { reversed } = this.props;
+      const scrollOffset = reversed ? scrollRight : scrollLeft;
       this.setState(prevState => {
-        if (prevState.scrollOffset === scrollLeft) {
+        if (prevState.scrollOffset === scrollOffset) {
           // Scroll position may have been updated by cDM/cDU,
           // In which case we don't need to trigger another render,
           // And we don't want to update state.isScrolling.
           return null;
         }
-        if (reversed) {
-          scrollLeft = 2 * prevState.scrollOffset - scrollLeft;
-          // base + diff = left, base - diff = ? => 2*base = left + ? => ? = 2*base - left
-        }
 
         return {
           isScrolling: true,
           scrollDirection:
-            prevState.scrollOffset < scrollLeft ? 'forward' : 'backward',
-          scrollOffset: scrollLeft,
+            prevState.scrollOffset < scrollOffset ? 'forward' : 'backward',
+          scrollOffset,
           scrollUpdateWasRequested: false,
         };
       }, this._resetIsScrollingDebounced);
     };
 
     _onScrollVertical = (event: ScrollEvent): void => {
-      let { scrollTop } = event.currentTarget;
+      const target = event.currentTarget;
+      const { scrollTop, scrollBottom } = this._getScrollLength(target);
       const { reversed } = this.props;
+      const scrollOffset = reversed ? scrollBottom : scrollTop;
       this.setState(prevState => {
-        if (prevState.scrollOffset === scrollTop) {
+        if (prevState.scrollOffset === scrollOffset) {
           // Scroll position may have been updated by cDM/cDU,
           // In which case we don't need to trigger another render,
           // And we don't want to update state.isScrolling.
           return null;
         }
 
-        if (reversed) {
-          scrollTop = 2 * prevState.scrollOffset - scrollTop;
-          // base + diff = top, base - diff = ? => 2*base = top + ? => ? = 2*base - top
-        }
-
         return {
           isScrolling: true,
           scrollDirection:
-            prevState.scrollOffset < scrollTop ? 'forward' : 'backward',
-          scrollOffset: scrollTop,
+            prevState.scrollOffset < scrollOffset ? 'forward' : 'backward',
+          scrollOffset,
           scrollUpdateWasRequested: false,
         };
       }, this._resetIsScrollingDebounced);
