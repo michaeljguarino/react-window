@@ -1,5 +1,5 @@
 {
-  "name": "react-window-docs",
+  "name": "react-window-reversed-docs",
   "homepage": "https://react-window.now.sh",
   "scripts": {
     "build": "node scripts/build.js",

@@ -1,21 +1,21 @@
 {
-  "name": "react-window",
-  "version": "1.2.4",
+  "name": "react-window-reversed",
+  "version": "1.2.5",
   "description":
     "React components for efficiently rendering large, scrollable lists and tabular data",
   "author":
     "Brian Vaughn <brian.david.vaughn@gmail.com> (https://github.com/bvaughn/)",
   "contributors": [
-    "Brian Vaughn <brian.david.vaughn@gmail.com> (https://github.com/bvaughn/)"
+    "Brian Vaughn <brian.david.vaughn@gmail.com> (https://github.com/bvaughn/), corupta (https://github.com/corupta/)"
   ],
   "license": "MIT",
-  "homepage": "http://react-window.now.sh/",
+  "homepage": "https://react-window-reversed.now.sh/",
   "repository": {
     "type": "git",
-    "url": "https://github.com/bvaughn/react-window.git"
+    "url": "https://github.com/corupta/react-window/tree/npm"
   },
   "bugs": {
-    "url": "https://github.com/bvaughn/react-window/issues"
+    "url": "https://github.com/corupta/react-window/issues"
   },
   "engines": {
     "node": ">8.0.0"
@@ -26,6 +26,8 @@
     "virtual",
     "window",
     "windowed",
+    "reverse",
+    "reversed",
     "list",
     "scrolling",
     "infinite",

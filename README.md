@@ -1,22 +1,25 @@
-# react-window
+# react-window-reversed 
+(react-window with reversed support)
+
+For the original repo, please check out https://github.com/bvaughn/react-window
 
 > React components for efficiently rendering large lists and tabular data
 
-[![NPM registry](https://img.shields.io/npm/v/react-window.svg?style=for-the-badge)](https://yarnpkg.com/en/package/react-window) [![Travis](https://img.shields.io/badge/ci-travis-green.svg?style=for-the-badge)](https://travis-ci.org/bvaughn/react-window) [![NPM license](https://img.shields.io/badge/license-mit-red.svg?style=for-the-badge)](LICENSE)
+[![NPM registry](https://img.shields.io/npm/v/react-window-reversed.svg?style=for-the-badge)](https://yarnpkg.com/en/package/react-window-reversed) [![NPM license](https://img.shields.io/badge/license-mit-red.svg?style=for-the-badge)](LICENSE)
 
 ## Install
 
 ```bash
 # Yarn
-yarn add react-window
+yarn add react-window-reversed
 
 # NPM
-npm install --save react-window
+npm install --save react-window-reversed
 ```
 
 ## Usage
 
-Learn more at [react-window.now.sh](https://react-window.now.sh/).
+Learn more at [react-window-reversed.now.sh](https://react-window-reversed.now.sh/).
 
 ## Frequently asked questions
 

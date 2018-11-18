@@ -24,7 +24,7 @@ export class Nav extends React.Component {
           <h1 className={styles.SideNavHeader}>
             <a
               className={styles.SideNavHeaderLink}
-              href="https://github.com/bvaughn/react-window"
+              href="https://github.com/corupta/react-window/tree/npm"
             >
               {title}
             </a>
