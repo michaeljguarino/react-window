@@ -69,6 +69,54 @@ const PROPS = [
     name: 'itemSize',
     type: '(index: number) => number',
   },
+  {
+    defaultValue: null,
+    description: (
+      <Fragment>
+        <p>
+          In order to save the state of a VariableSizeList (calculated real sizes of the data), pass a
+          function via this prop and save its input to later give it within initialMetadata prop.
+
+          For example, if you're caching the data in the list and also saving the scrollOffset obtained
+          via onScroll, also save the metadata via providing an onUpdateMetadata function, otherwise
+          when giving an initialScrollOffset it would point to an estimated position instead of the exact
+          position.
+
+          IMPORTANT: Do not mutate the given metadata. (It's not a copy but the object itself)
+        </p>
+      </Fragment>
+    ),
+    isRequired: false,
+    name: 'onUpdateMetadata',
+    type: '(metadata: { itemMetadataMap: { [index: number]: ItemMetadata }, lastEstimatedIndex: number }) => void'
+  },
+  {
+    defaultValue: {
+      itemMetadataMap: {},
+      lastEstimatedIndex: -1
+    },
+    description: (
+      <Fragment>
+        <p>
+          In order to reload saved state of a VariableSizeList, send the saved metadata via this prop.
+
+          For example, if you're caching the data in the list and also saving the scrollOffset obtained
+          via onScroll and giving it back via initialScrollOffset when it's remounted, you should also save
+          the last calculated metadata obtained from onUpdateMetadata, so that the given scrollOffset would
+          result in the same position of the position in saved list.
+
+          That's only necessary because VariableSizeList makes estimations about the size until the content is
+          scrolled, and in order to start from the exact same position not the estimated position, the metadata
+          of those calculations should also be provided.
+
+          IMPORTANT: Do not mutate the given metadata. (It's not a copy but the object itself)
+        </p>
+      </Fragment>
+    ),
+    isRequired: false,
+    name: 'initialMetadata',
+    type: '{ itemMetadataMap: { [index: number]: ItemMetadata }, lastEstimatedIndex: number }'
+  }
 ];
 
 const METHODS = [

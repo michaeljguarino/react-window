@@ -5,18 +5,28 @@ import createListComponent from './createListComponent';
 import type { Props, ScrollToAlign } from './createListComponent';
 
 const DEFAULT_ESTIMATED_ITEM_SIZE = 50;
-
-type VariableSizeProps = {|
-  estimatedItemSize: number,
-  ...Props<any>,
-|};
-
-type itemSizeGetter = (index: number) => number;
+const DEFAULT_ITEM_METADATA_MAP = {};
+const DEFAULT_LAST_MEASURED_INDEX = -1;
 
 type ItemMetadata = {|
   offset: number,
   size: number,
 |};
+
+type InitialMetadata = {|
+  itemMetadataMap: { [index: number]: ItemMetadata },
+  lastMeasuredIndex: number,
+|};
+
+type VariableSizeProps = {|
+  estimatedItemSize: number,
+  onUpdateMetadata: function,
+  initialMetadata: InitialMetadata,
+  ...Props<any>,
+|};
+
+type itemSizeGetter = (index: number) => number;
+
 type InstanceProps = {|
   itemMetadataMap: { [index: number]: ItemMetadata },
   estimatedItemSize: number,
@@ -28,7 +38,7 @@ const getItemMetadata = (
   index: number,
   instanceProps: InstanceProps
 ): ItemMetadata => {
-  const { itemSize } = ((props: any): VariableSizeProps);
+  const { itemSize, onUpdateMetadata } = ((props: any): VariableSizeProps);
   const { itemMetadataMap, lastMeasuredIndex } = instanceProps;
 
   if (index > lastMeasuredIndex) {
@@ -50,6 +60,13 @@ const getItemMetadata = (
     }
 
     instanceProps.lastMeasuredIndex = index;
+
+    if (onUpdateMetadata) {
+      onUpdateMetadata({
+        itemMetadataMap,
+        lastMeasuredIndex
+      });
+    }
   }
 
   return itemMetadataMap[index];
@@ -246,12 +263,12 @@ const VariableSizeList = createListComponent({
   },
 
   initInstanceProps(props: Props<any>, instance: any): InstanceProps {
-    const { estimatedItemSize } = ((props: any): VariableSizeProps);
+    const { estimatedItemSize, initialMetadata = {} } = ((props: any): VariableSizeProps);
 
     const instanceProps = {
-      itemMetadataMap: {},
+      itemMetadataMap: initialMetadata.itemMetadataMap || DEFAULT_ITEM_METADATA_MAP,
       estimatedItemSize: estimatedItemSize || DEFAULT_ESTIMATED_ITEM_SIZE,
-      lastMeasuredIndex: -1,
+      lastMeasuredIndex: initialMetadata.lastMeasuredIndex || DEFAULT_LAST_MEASURED_INDEX,
     };
 
     instance.resetAfterIndex = (
