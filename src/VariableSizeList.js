@@ -13,15 +13,17 @@ type ItemMetadata = {|
   size: number,
 |};
 
-type InitialMetadata = {|
+type Metadata = {|
   itemMetadataMap: { [index: number]: ItemMetadata },
   lastMeasuredIndex: number,
 |};
 
+type onUpdateMetadataCallback = (metadata: Metadata) => void;
+
 type VariableSizeProps = {|
   estimatedItemSize: number,
-  onUpdateMetadata: function,
-  initialMetadata: InitialMetadata,
+  onUpdateMetadata: onUpdateMetadataCallback,
+  initialMetadata: Metadata,
   ...Props<any>,
 |};
 
